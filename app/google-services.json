@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "837269411810",
+    "firebase_url": "https://sameway-3bec4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sameway-3bec4",
+    "storage_bucket": "sameway-3bec4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837269411810:android:c4850017262bcd9b200bbb",
+        "android_client_info": {
+          "package_name": "com.google.maps.android.compose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837269411810-m5qfql86cbhej8db55vfbspmseqgps3l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.google.maps.android.compose",
+            "certificate_hash": "633d9f5079669c1eef82e6c96e3fa5b732d6e3f2"
+          }
+        },
+        {
+          "client_id": "837269411810-iu3i3t8t6tfs75plh19mipej7o1qncmq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCfi-zuKhCbM39ScKcfWd0R6ZG78l7PpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "837269411810-iu3i3t8t6tfs75plh19mipej7o1qncmq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
