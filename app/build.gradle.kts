@@ -23,7 +23,7 @@ android {
         }
     }
 
-    namespace = "com.google.maps.android.compose"
+    namespace = "com.isi.sameway"
     compileSdk = 34
 
     defaultConfig {
@@ -84,7 +84,6 @@ dependencies {
     // Instead of the lines below, regular apps would load these libraries from Maven according to
     // the README installation instructions
     implementation(project(":maps-compose"))
-    implementation(project(":maps-compose-widgets"))
     implementation(project(":maps-compose-utils"))
 }
 

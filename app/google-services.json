@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "837269411810",
-    "firebase_url": "https://sameway-3bec4-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "sameway-3bec4",
-    "storage_bucket": "sameway-3bec4.firebasestorage.app"
+    "project_number": "834495098558",
+    "firebase_url": "https://sameway-2-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sameway-2",
+    "storage_bucket": "sameway-2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:837269411810:android:c4850017262bcd9b200bbb",
+        "mobilesdk_app_id": "1:834495098558:android:9d2647669b6c4f4c93b8ef",
         "android_client_info": {
-          "package_name": "com.google.maps.android.compose"
+          "package_name": "com.isi.sameway"
         }
       },
       "oauth_client": [
         {
-          "client_id": "837269411810-m5qfql86cbhej8db55vfbspmseqgps3l.apps.googleusercontent.com",
+          "client_id": "834495098558-2i6ugtmkhrs5jflbuav54hcn21k7akdo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.google.maps.android.compose",
-            "certificate_hash": "633d9f5079669c1eef82e6c96e3fa5b732d6e3f2"
+            "package_name": "com.isi.sameway",
+            "certificate_hash": "53cde94f1a788c6bdd9be0a0fe1a8af9f71d0606"
           }
         },
         {
-          "client_id": "837269411810-iu3i3t8t6tfs75plh19mipej7o1qncmq.apps.googleusercontent.com",
+          "client_id": "834495098558-4p8kcs745c2d2d7cut7mpet1k7d8l8mt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCCfi-zuKhCbM39ScKcfWd0R6ZG78l7PpU"
+          "current_key": "AIzaSyBdvj2tdphPGuw1aW9kRI16sHW2DypEjyw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "837269411810-iu3i3t8t6tfs75plh19mipej7o1qncmq.apps.googleusercontent.com",
+              "client_id": "834495098558-4p8kcs745c2d2d7cut7mpet1k7d8l8mt.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
