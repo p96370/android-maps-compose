@@ -66,6 +66,7 @@ private val log = logging()
 @Composable
 fun DriverScreen(
     viewModel: DriverScreenViewModel = viewModel(),
+    navigateToProfile: () -> Unit,
 ) {
     val state = viewModel.state.collectAsState().value
 
@@ -237,7 +238,7 @@ fun DriverScreen(
 
         }
 
-        VictoryScreen(visible = showVictoryScreen)
+        VictoryScreen(visible = showVictoryScreen, navigateToProfile)
     }
 }
 

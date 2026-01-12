@@ -25,6 +25,7 @@ import com.google.maps.android.compose.theme.backgroundColor
 @Composable
 fun ChooseScreen(
     navigateToDriver: () -> Unit,
+    navigatetoClient: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize().background(color = backgroundColor),
@@ -41,5 +42,14 @@ fun ChooseScreen(
         Image(
             painterResource(R.drawable.driver), contentDescription = null,
             modifier = Modifier.weight(1f).clickable { navigateToDriver() })
+
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.Black
+        )
+        Text("Client", modifier = Modifier.padding(48.dp), fontSize = 22.sp)
+        Image(
+            painterResource(R.drawable.person), contentDescription = null,
+            modifier = Modifier.weight(1f).clickable { navigatetoClient() })
     }
 }

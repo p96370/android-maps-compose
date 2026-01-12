@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.maps.android.PolyUtil
+import com.google.maps.android.compose.directions.NetworkRepository
 import com.google.maps.android.compose.firebase.Client
 import com.google.maps.android.compose.firebase.FirebaseDatabaseHelper
 import com.google.maps.android.compose.firebase.FirebaseDatabaseHelper.observeIncomingClients
@@ -54,9 +55,9 @@ class DriverScreenViewModel : ViewModel() {
         viewModelScope.launch {
             _state.value = newState
 
-//            val encoded = NetworkRepository.requestPath(newState.road[0], newState.road[1])
+            val encoded = NetworkRepository.requestPath(newState.road[0], newState.road[1])
 
-            val encoded = "gyenGgr~}CVVHL@h@@lA@fCDnKrBAJO^Aj@@GaREeJKc[Ow^G}@SiAuAcGUkAQsBGoBQyA[yA]iAeDyI{@kCaBgGOk@{@_Di@uAWqAAWBS|@}BtHsQ|A{DwIuNiAoBiGaKuDiGCI?o@@kAI}IMeF\\}LDwDDuARqDAiB]aIMgDC}DIoAsB_LIUR]x@oAl@q@`@[HWBYGk@eBcHa@sEEe@rHuCrHcDlKiEJDJ@JCLKFWAe@O[IE]_AE[c@yD}@{HCgBKiAKe@M@YBD|@Fj@\\jAH`@ZvC\\bDV`CQDED"
+//            val encoded = "gyenGgr~}CVVHL@h@@lA@fCDnKrBAJO^Aj@@GaREeJKc[Ow^G}@SiAuAcGUkAQsBGoBQyA[yA]iAeDyI{@kCaBgGOk@{@_Di@uAWqAAWBS|@}BtHsQ|A{DwIuNiAoBiGaKuDiGCI?o@@kAI}IMeF\\}LDwDDuARqDAiB]aIMgDC}DIoAsB_LIUR]x@oAl@q@`@[HWBYGk@eBcHa@sEEe@rHuCrHcDlKiEJDJ@JCLKFWAe@O[IE]_AE[c@yD}@{HCgBKiAKe@M@YBD|@Fj@\\jAH`@ZvC\\bDV`CQDED"
             log.d { "Route encoded: $encoded" }
 
             // other: "a`inGich~Cc@cHlEc@zEe@zEe@fAIzAAQhIzDClAAAl@Er@Ib@ODOLKPGVAX@ZFR@BMZkAvCaExJkB|E_A~BPXHXH^hAxDhBvGzEuClBkA|@e@nAm@hBaA`@YXU]cAAK?EFQCQDQFG"

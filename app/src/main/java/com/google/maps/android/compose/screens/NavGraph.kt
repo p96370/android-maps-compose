@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.maps.android.compose.client.ClientScreen
 import com.google.maps.android.compose.driver.DriverScreen
 
 @Composable
@@ -18,18 +19,28 @@ fun NavGraph() {
 
     NavHost(navController = navController, startDestination = Route.Choose.route) {
         route(Route.Choose) {
-            ChooseScreen(navigateToDriver = { navController.popAndNavigate(Route.Driver) })
+            ChooseScreen(navigateToDriver = { navController.popAndNavigate(Route.Driver) },
+                navigatetoClient = { navController.popAndNavigate(Route.Client) })
+        }
+        route(Route.Client) {
+            ClientScreen()
         }
         route(Route.Driver) {
-            DriverScreen()
+            DriverScreen(navigateToProfile = { navController.popAndNavigate(Route.Profile) })
         }
+        route(Route.Profile) {
+            ProfileScreen()
+        }
+
     }
 }
 
 
 sealed class Route(val route: String) {
     data object Choose : Route("choose")
+    data object Client : Route("client")
     data object Driver : Route("driver")
+    data object Profile : Route("profile")
 }
 
 fun NavGraphBuilder.route(

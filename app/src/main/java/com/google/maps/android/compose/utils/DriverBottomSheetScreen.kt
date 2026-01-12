@@ -353,7 +353,7 @@ private fun ClientInfoSection(client: Client, index: Int) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Elena",
+                text = "Alexandru-Ioan",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 24.sp
             )

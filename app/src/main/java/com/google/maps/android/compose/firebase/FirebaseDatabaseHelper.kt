@@ -1,5 +1,6 @@
 package com.google.maps.android.compose.firebase
 
+import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import com.firebase.ui.auth.AuthUI
@@ -95,6 +96,21 @@ object FirebaseDatabaseHelper {
         }
     }
 
+    fun updateUserRating(userId: String, newRating: Float) {
+        usersRef.child(userId).child("rating").setValue(newRating)
+    }
+
+    fun observeUsers(callback: (List<User>) -> Unit) {
+        usersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val users = snapshot.children.mapNotNull { it.getValue(User::class.java) }
+                callback(users)
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
     fun observeRoutes(callback: (List<Route>) -> Unit) {
         usersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -150,6 +166,14 @@ object FirebaseDatabaseHelper {
 
             override fun onCancelled(error: DatabaseError) {}
         })
+    }
+
+    fun signOut(context: Context) {
+        AuthUI.getInstance().signOut(context)
+    }
+
+    fun delete(context: Context) {
+        AuthUI.getInstance().delete(context)
     }
 
     fun signIn(signInLauncher: ActivityResultLauncher<Intent>) {

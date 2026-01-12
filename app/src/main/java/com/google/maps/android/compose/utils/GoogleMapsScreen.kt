@@ -15,6 +15,8 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.rememberCameraPositionState
 import org.lighthousegames.logging.logging
+
+private val log = logging()
 @Composable
 fun GoogleMapsScreen(
     onMapClick: (LatLng) -> Unit,

@@ -44,5 +44,7 @@ data class FirebaseClient(
     val start: CustomLatLng = CustomLatLng(),
     val end: CustomLatLng = CustomLatLng(),
     val status: String = "Waiting"
-)
+) {
+    constructor() : this("", CustomLatLng(), CustomLatLng(), "Waiting")
+}
 
