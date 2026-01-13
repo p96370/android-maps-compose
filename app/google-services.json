@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "834495098558-vl5udargvmspffjief4mehhm23540olq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.isi.sameway",
+            "certificate_hash": "633d9f5079669c1eef82e6c96e3fa5b732d6e3f2"
+          }
+        },
+        {
           "client_id": "834495098558-4p8kcs745c2d2d7cut7mpet1k7d8l8mt.apps.googleusercontent.com",
           "client_type": 3
         }

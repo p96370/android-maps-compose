@@ -63,13 +63,15 @@ data class TripSummary(
     companion object {
         /**
          * Creates a TripSummary from route data with calculated values.
+         * Uses client route distances (in km) for accurate earnings calculation.
          */
         fun fromRoute(
             coordinates: List<LatLng>,
-            clientsCount: Int
+            clientRouteDistances: List<Double>
         ): TripSummary {
             val distanceKm = RouteCalculations.calculateDistanceKm(coordinates)
-            val moneyEarned = RouteCalculations.calculateMoneyEarned(coordinates, clientsCount)
+            val moneyEarned = RouteCalculations.calculateTotalDriverEarnings(clientRouteDistances)
+            val clientsCount = clientRouteDistances.size
             val travelTime = RouteCalculations.calculateTravelTimeMinutes(coordinates)
             val fuelSaved = RouteCalculations.calculateFuelSaved(coordinates, clientsCount + 1)
             // CO2 saved: ~2.3 kg per liter of fuel
@@ -80,7 +82,7 @@ data class TripSummary(
                 totalTimeMinutes = travelTime,
                 peopleHelped = clientsCount,
                 fuelSaved = RouteCalculations.formatFuel(fuelSaved),
-                distanceKm = "%.1f km".format(distanceKm),
+                distanceKm = RouteCalculations.formatDistanceKm(distanceKm),
                 co2Saved = "%.1f kg".format(co2Saved)
             )
         }
@@ -99,7 +101,7 @@ data class TripSummary(
                 totalTimeMinutes = travelTime,
                 peopleHelped = 1,
                 fuelSaved = RouteCalculations.formatFuel(fuelSaved),
-                distanceKm = "%.1f km".format(distanceKm),
+                distanceKm = RouteCalculations.formatDistanceKm(distanceKm),
                 co2Saved = "%.1f kg".format(co2Saved)
             )
         }

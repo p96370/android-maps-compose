@@ -157,12 +157,14 @@ private fun ClientBottomSheetContent(
                     val clientRoute = matchedRoute?.route?.coordinates ?: emptyList()
                     val driverCarPosition = state.carPosition
                     val driverRouteStartIndex = matchedRoute?.driverRouteStartIndex ?: 0
+                    // Get the driver route coordinates up to the client pickup point
+                    val driverRouteToPickup = matchedRoute?.route?.coordinates?.take(driverRouteStartIndex + 1) ?: emptyList()
 
                     RideStatusView(
                         acceptedByDriver = state.acceptedByDriver,
                         clientPickupTime = clientPickupTime,
                         driverStartTime = driverStartTime,
-                        driverRouteStartIndex = driverRouteStartIndex,
+                        driverRouteCoordinates = driverRouteToPickup,
                         clientRouteCoordinates = clientRoute,
                         currentCarPosition = driverCarPosition,
                         roadStarted = state.roadStarted
@@ -506,7 +508,7 @@ private fun DriverOfferCard(
     onDecline: () -> Unit
 ) {
     // Client price includes the 20% app fee
-    val clientPrice = RouteCalculations.calculateClientPrice(matchedRoute.route.coordinates.size)
+    val clientPrice = RouteCalculations.calculateClientPrice(matchedRoute.route.coordinates)
     val driverStartTime = matchedRoute.route.startingTime
     val clientPickupTime = clientRequestedTime
 
@@ -627,20 +629,20 @@ private fun RideStatusView(
     acceptedByDriver: Boolean?,
     clientPickupTime: Int,
     driverStartTime: Int,
-    driverRouteStartIndex: Int,
+    driverRouteCoordinates: List<LatLng>,
     clientRouteCoordinates: List<LatLng>,
     currentCarPosition: Int,
     roadStarted: Boolean
 ) {
     val formattedClientTime = TimeUtils.formatTime(clientPickupTime)
-    val clientPrice = RouteCalculations.calculateClientPrice(clientRouteCoordinates.size)
+    val clientPrice = RouteCalculations.calculateClientPrice(clientRouteCoordinates)
 
-    // Calculate dynamic time to arrival
-    val minutesAway = if (roadStarted && clientRouteCoordinates.isNotEmpty()) {
-        val remainingToPickup = maxOf(0, driverRouteStartIndex - currentCarPosition)
-        (remainingToPickup * 0.8).toInt().coerceAtLeast(1)
-    } else if (acceptedByDriver == true) {
-        RouteCalculations.calculateTravelTimeMinutes(driverRouteStartIndex)
+    // Calculate dynamic time to arrival based on remaining driver route coordinates
+    val minutesAway = if (roadStarted && driverRouteCoordinates.isNotEmpty()) {
+        val remainingCoordinates = driverRouteCoordinates.drop(currentCarPosition)
+        RouteCalculations.calculateTravelTimeMinutes(remainingCoordinates)
+    } else if (acceptedByDriver == true && driverRouteCoordinates.isNotEmpty()) {
+        RouteCalculations.calculateTravelTimeMinutes(driverRouteCoordinates)
     } else {
         0
     }
@@ -769,8 +771,14 @@ private fun RideConfirmedPreview() {
         acceptedByDriver = true,
         clientPickupTime = 1430,
         driverStartTime = 1400,
-        driverRouteStartIndex = 50,
-        clientRouteCoordinates = emptyList(),
+        driverRouteCoordinates = listOf(
+            LatLng(44.4268, 26.1025),
+            LatLng(44.4368, 26.1125)
+        ),
+        clientRouteCoordinates = listOf(
+            LatLng(44.4368, 26.1125),
+            LatLng(44.4468, 26.1225)
+        ),
         currentCarPosition = 0,
         roadStarted = false
     )

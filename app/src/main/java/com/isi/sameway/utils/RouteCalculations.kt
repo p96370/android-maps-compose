@@ -6,6 +6,7 @@ import kotlin.math.sqrt
 
 /**
  * Utility object for calculating route-related statistics.
+ * All calculations use actual coordinates and haversine distance for accuracy.
  */
 object RouteCalculations {
 
@@ -17,8 +18,11 @@ object RouteCalculations {
     private const val AVERAGE_SPEED_KMH = 30.0 // Average city speed
     private const val APP_FEE_PERCENTAGE = 0.20 // 20% app cut
 
+    // region Distance Calculations
+
     /**
-     * Calculates the total distance of a route in kilometers.
+     * Calculates the total distance of a route in kilometers using haversine formula.
+     * This is the sum of distances between each consecutive coordinate pair.
      */
     fun calculateDistanceKm(coordinates: List<LatLng>): Double {
         if (coordinates.size < 2) return 0.0
@@ -31,100 +35,82 @@ object RouteCalculations {
     }
 
     /**
-     * Calculates the price for a ride based on distance.
-     * Returns formatted string like "12.50"
+     * Formats distance as a readable string with km unit.
      */
-    fun calculatePrice(coordinatesCount: Int): String {
-        // Rough estimate: each coordinate point ~ 50 meters
-        val estimatedKm = coordinatesCount * 0.05
-        val price = BASE_FARE + (estimatedKm * PRICE_PER_KM)
-        return "%.2f".format(price)
+    fun formatDistanceKm(distanceKm: Double): String {
+        return "%.1f km".format(distanceKm)
     }
 
     /**
-     * Calculates the price for a ride based on actual coordinates.
+     * Formats distance from coordinates as a readable string.
      */
-    fun calculatePrice(coordinates: List<LatLng>): String {
-        val distanceKm = calculateDistanceKm(coordinates)
-        val price = BASE_FARE + (distanceKm * PRICE_PER_KM)
-        return "%.2f".format(price)
+    fun formatDistanceKm(coordinates: List<LatLng>): String {
+        return formatDistanceKm(calculateDistanceKm(coordinates))
     }
 
+    // endregion
+
+    // region Price Calculations
+
     /**
-     * Calculates the base price for a ride based on coordinate count.
+     * Calculates the base price for a ride based on distance.
      * This is the raw price calculation before any fees.
      */
-    private fun calculateBasePrice(coordinatesCount: Int): Double {
-        val estimatedKm = coordinatesCount * 0.05
-        return BASE_FARE + (estimatedKm * PRICE_PER_KM)
-    }
-
-    /**
-     * Calculates the base price for a ride based on actual coordinates.
-     */
-    private fun calculateBasePrice(coordinates: List<LatLng>): Double {
-        val distanceKm = calculateDistanceKm(coordinates)
+    private fun calculateBasePrice(distanceKm: Double): Double {
         return BASE_FARE + (distanceKm * PRICE_PER_KM)
     }
 
     /**
-     * Calculates the price the client pays.
-     * Client pays: base_price * 1.25 (includes 20% app fee)
+     * Calculates the price the client pays based on distance in km.
+     * Client pays: base_price / 0.8 (includes 20% app fee)
      * Formula: If driver should receive X, client pays X * 1.25
      * This way: driver gets X, app gets X * 0.25
      *
-     * Example: base = 10 LEI -> client pays 12 LEI, driver receives 10 LEI, app gets 2 LEI
+     * Example: base = 10 LEI -> client pays 12.50 LEI, driver receives 10 LEI, app gets 2.50 LEI
      */
-    fun calculateClientPrice(coordinatesCount: Int): String {
-        val basePrice = calculateBasePrice(coordinatesCount)
-        // Client pays 25% more so that after 20% cut, driver gets the base price
-        // If client pays P, driver gets P * 0.8 = basePrice, so P = basePrice / 0.8 = basePrice * 1.25
+    fun calculateClientPrice(distanceKm: Double): String {
+        val basePrice = calculateBasePrice(distanceKm)
         val clientPrice = basePrice / (1 - APP_FEE_PERCENTAGE)
         return "%.2f".format(clientPrice)
-    }
-
-    /**
-     * Calculates what the driver receives for a ride.
-     * Driver receives: client_price * 0.8 (client payment minus 20% app fee)
-     * This equals the base price.
-     */
-    fun calculateDriverPrice(coordinatesCount: Int): String {
-        val basePrice = calculateBasePrice(coordinatesCount)
-        return "%.2f".format(basePrice)
     }
 
     /**
      * Calculates the price the client pays based on actual coordinates.
      */
     fun calculateClientPrice(coordinates: List<LatLng>): String {
-        val basePrice = calculateBasePrice(coordinates)
-        val clientPrice = basePrice / (1 - APP_FEE_PERCENTAGE)
-        return "%.2f".format(clientPrice)
+        val distanceKm = calculateDistanceKm(coordinates)
+        return calculateClientPrice(distanceKm)
     }
 
     /**
-     * Calculates what the driver receives based on actual coordinates.
+     * Calculates what the driver receives for a ride based on distance in km.
+     * Driver receives: base_price (client payment minus 20% app fee)
      */
-    fun calculateDriverPrice(coordinates: List<LatLng>): String {
-        val basePrice = calculateBasePrice(coordinates)
+    fun calculateDriverPrice(distanceKm: Double): String {
+        val basePrice = calculateBasePrice(distanceKm)
         return "%.2f".format(basePrice)
     }
 
     /**
-     * Calculates estimated travel time in minutes.
+     * Calculates total driver earnings by summing the driver price for each client's route distance.
+     */
+    fun calculateTotalDriverEarnings(clientRouteDistances: List<Double>): Double {
+        if (clientRouteDistances.isEmpty()) return 0.0
+        return clientRouteDistances.sumOf { distanceKm ->
+            calculateBasePrice(distanceKm)
+        }
+    }
+
+    // endregion
+
+    // region Time Calculations
+
+    /**
+     * Calculates estimated travel time in minutes based on coordinates.
      */
     fun calculateTravelTimeMinutes(coordinates: List<LatLng>): Int {
         val distanceKm = calculateDistanceKm(coordinates)
         return ((distanceKm / AVERAGE_SPEED_KMH) * 60).toInt().coerceAtLeast(1)
-    }
-
-    /**
-     * Calculates estimated travel time in minutes based on coordinate count.
-     */
-    fun calculateTravelTimeMinutes(coordinatesCount: Int): Int {
-        // Rough estimate based on coordinates
-        val estimatedKm = coordinatesCount * 0.05
-        return ((estimatedKm / AVERAGE_SPEED_KMH) * 60).toInt().coerceAtLeast(1)
     }
 
     /**
@@ -142,6 +128,10 @@ object RouteCalculations {
         }
     }
 
+    // endregion
+
+    // region Fuel & Environmental Calculations
+
     /**
      * Calculates fuel saved by carpooling.
      * Each additional person saves the full fuel that would have been used if they drove alone.
@@ -154,30 +144,15 @@ object RouteCalculations {
     }
 
     /**
-     * Calculates fuel saved based on coordinates count and people count.
-     */
-    fun calculateFuelSaved(coordinatesCount: Int, peopleCount: Int): Double {
-        if (peopleCount <= 1) return 0.0
-        val estimatedKm = coordinatesCount * 0.05
-        return estimatedKm * FUEL_CONSUMPTION_PER_KM * (peopleCount - 1)
-    }
-
-    /**
      * Formats fuel amount as a readable string.
      */
     fun formatFuel(liters: Double): String {
         return "%.1fL".format(liters)
     }
 
-    /**
-     * Calculates money earned by driver for giving rides.
-     */
-    fun calculateMoneyEarned(coordinates: List<LatLng>, clientsCount: Int): Double {
-        if (clientsCount <= 0) return 0.0
-        val distanceKm = calculateDistanceKm(coordinates)
-        val pricePerClient = BASE_FARE + (distanceKm * PRICE_PER_KM)
-        return pricePerClient * clientsCount
-    }
+    // endregion
+
+    // region Money Formatting
 
     /**
      * Formats money as a readable string with LEI currency.
@@ -185,6 +160,56 @@ object RouteCalculations {
     fun formatMoney(amount: Double): String {
         return "%.2f LEI".format(amount)
     }
+
+    // endregion
+
+    // region Route Position Calculations
+
+    /**
+     * Finds the index of the closest point on the route to a given target position.
+     * Returns the index in the route coordinates list.
+     */
+    fun findClosestPointIndex(route: List<LatLng>, target: LatLng): Int {
+        if (route.isEmpty()) return 0
+
+        var closestIndex = 0
+        var minDistance = Double.MAX_VALUE
+
+        route.forEachIndexed { index, point ->
+            val distance = haversineDistance(point, target)
+            if (distance < minDistance) {
+                minDistance = distance
+                closestIndex = index
+            }
+        }
+
+        return closestIndex
+    }
+
+    /**
+     * Checks if the car has passed a specific marker position on the route.
+     * @param route The full route coordinates
+     * @param carPositionIndex The current car position index on the route
+     * @param markerPosition The marker's position to check
+     * @param thresholdPoints Additional points buffer to ensure marker is truly passed (default 2)
+     * @return true if the car has passed the marker
+     */
+    fun hasCarPassedMarker(
+        route: List<LatLng>,
+        carPositionIndex: Int,
+        markerPosition: LatLng,
+        thresholdPoints: Int = 2
+    ): Boolean {
+        if (route.isEmpty()) return false
+
+        val markerIndex = findClosestPointIndex(route, markerPosition)
+        // Car has passed if its position is beyond the marker index plus threshold
+        return carPositionIndex >= markerIndex + thresholdPoints
+    }
+
+    // endregion
+
+    // region Private Helpers
 
     /**
      * Haversine formula to calculate distance between two LatLng points.
@@ -204,4 +229,6 @@ object RouteCalculations {
 
         return EARTH_RADIUS_KM * c
     }
+
+    // endregion
 }

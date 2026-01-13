@@ -29,10 +29,10 @@ data class Client(
     val status: String = "Waiting",
     /** The client's requested pickup time in HHMM format (e.g., 1430 = 14:30) */
     val requestedTime: Int = 0,
-    /** The number of coordinates in the client's route segment for price calculation */
-    val routeSegmentSize: Int = 0
+    /** The distance of the client's route segment in kilometers for price calculation */
+    val routeDistanceKm: Double = 0.0
 ) {
-    constructor() : this("", LatLng(0.0, 0.0), LatLng(0.0, 0.0), "Waiting", 0, 0)
+    constructor() : this("", LatLng(0.0, 0.0), LatLng(0.0, 0.0), "Waiting", 0, 0.0)
 }
 
 @IgnoreExtraProperties
@@ -51,8 +51,8 @@ data class FirebaseClient(
     val end: CustomLatLng = CustomLatLng(),
     val status: String = "Waiting",
     val requestedTime: Int = 0,
-    val routeSegmentSize: Int = 0
+    val routeDistanceKm: Double = 0.0
 ) {
-    constructor() : this("", CustomLatLng(), CustomLatLng(), "Waiting", 0, 0)
+    constructor() : this("", CustomLatLng(), CustomLatLng(), "Waiting", 0, 0.0)
 }
 

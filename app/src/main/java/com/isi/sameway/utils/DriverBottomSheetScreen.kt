@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -123,6 +124,7 @@ private fun DriverBottomSheetContent(
                 "Initial" -> WelcomeView()
                 "Loading" -> RouteCalculatingView()
                 "Loaded" -> RouteConfirmationView(
+                    roadCoordinates = state.road,
                     postRoute = { startTime -> postRoute(startTime) },
                     declineRoute = declineRoute
                 )
@@ -332,6 +334,7 @@ private fun RouteCalculatingView() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RouteConfirmationView(
+    roadCoordinates: List<LatLng>,
     postRoute: (Int) -> Unit,
     declineRoute: () -> Unit
 ) {
@@ -350,6 +353,7 @@ private fun RouteConfirmationView(
     ) { showingTimePicker ->
         if (!showingTimePicker) {
             RouteDetailsCard(
+                roadCoordinates = roadCoordinates,
                 onContinue = { showTimePicker = true },
                 onCancel = declineRoute
             )
@@ -368,9 +372,14 @@ private fun RouteConfirmationView(
 
 @Composable
 private fun RouteDetailsCard(
+    roadCoordinates: List<LatLng>,
     onContinue: () -> Unit,
     onCancel: () -> Unit
 ) {
+    val distanceKm = RouteCalculations.formatDistanceKm(roadCoordinates)
+    val travelTimeMinutes = RouteCalculations.calculateTravelTimeMinutes(roadCoordinates)
+    val formattedTime = RouteCalculations.formatTravelTime(travelTimeMinutes)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -400,8 +409,8 @@ private fun RouteDetailsCard(
                     .padding(10.dp),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                CompactStatItem(emoji = "⏱", value = "23 min")
-                CompactStatItem(emoji = "📍", value = "12.5 km")
+                CompactStatItem(emoji = "⏱", value = formattedTime)
+                CompactStatItem(emoji = "📍", value = distanceKm)
                 CompactStatItem(emoji = "👥", value = "4 seats")
             }
 
@@ -613,7 +622,7 @@ private fun RiderRequestCard(
     } else {
         TimeUtils.formatTime(TimeUtils.addMinutes(startingTime, (index + 1) * 5))
     }
-    val driverEarning = RouteCalculations.calculateDriverPrice(client.routeSegmentSize)
+    val driverEarning = RouteCalculations.calculateDriverPrice(client.routeDistanceKm)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -761,14 +770,21 @@ private fun WelcomePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun RouteDetailsPreview() {
-    RouteDetailsCard(onContinue = {}, onCancel = {})
+    RouteDetailsCard(
+        roadCoordinates = listOf(
+            LatLng(44.4268, 26.1025),
+            LatLng(44.4368, 26.1125)
+        ),
+        onContinue = {},
+        onCancel = {}
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun RiderRequestPreview() {
     RiderRequestCard(
-        client = Client(status = "Waiting", routeSegmentSize = 50),
+        client = Client(status = "Waiting", routeDistanceKm = 2.5),
         index = 0,
         startingTime = 1200,
         onAccept = {},

@@ -11,6 +11,8 @@ import com.isi.sameway.firebase.Client
 import com.isi.sameway.utils.CarMarker
 import com.isi.sameway.utils.DrawPoliline
 import com.isi.sameway.utils.MapIconDescriptors
+import com.isi.sameway.utils.RouteCalculations
+import kotlin.math.max
 import kotlin.math.max
 
 /**
@@ -99,9 +101,11 @@ private fun ConfirmedRouteMapContent(
     carPosition: LatLng,
     icons: MapIconDescriptors
 ) {
-    // Draw client markers
+    // Draw client markers (hide markers after car passes them)
     ClientMarkers(
         clients = state.incomingClients,
+        route = state.road,
+        carPositionIndex = state.carPosition,
         sourceIcon = icons.personIcon,
         destinationIcon = icons.destinationIcon
     )
@@ -118,21 +122,38 @@ private fun ConfirmedRouteMapContent(
 
 /**
  * Renders markers for all incoming clients.
+ * Markers are hidden after the driver car passes them.
  */
 @Composable
 private fun ClientMarkers(
     clients: List<Client>,
+    route: List<LatLng>,
+    carPositionIndex: Int,
     sourceIcon: BitmapDescriptor,
     destinationIcon: BitmapDescriptor
 ) {
     clients.forEach { client ->
-        // Show pickup marker only if client hasn't been picked up or finished
-        if (client.status != "Picked" && client.status != "Finished") {
+        // Show pickup marker only if:
+        // 1. Client hasn't been picked up or finished
+        // 2. Car hasn't passed the pickup location yet
+        val hasPassedPickup = RouteCalculations.hasCarPassedMarker(
+            route = route,
+            carPositionIndex = carPositionIndex,
+            markerPosition = client.start
+        )
+        if (client.status != "Picked" && client.status != "Finished" && !hasPassedPickup) {
             ClientPickupMarker(client, sourceIcon)
         }
 
-        // Always show destination marker
-        ClientDestinationMarker(client, destinationIcon)
+        // Show destination marker only if car hasn't passed it yet
+        val hasPassedDestination = RouteCalculations.hasCarPassedMarker(
+            route = route,
+            carPositionIndex = carPositionIndex,
+            markerPosition = client.end
+        )
+        if (!hasPassedDestination) {
+            ClientDestinationMarker(client, destinationIcon)
+        }
     }
 }
 

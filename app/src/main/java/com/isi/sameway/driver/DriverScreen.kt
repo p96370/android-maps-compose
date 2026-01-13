@@ -113,19 +113,23 @@ fun DriverScreen(
 
         // Calculate trip summary from completed trip data or current state
         val tripSummary = completedTripData?.let { tripData ->
+            val activeClients = tripData.clients.filter {
+                it.status == "Active" || it.status == "Picked" || it.status == "Finished"
+            }
             TripSummary.fromRoute(
                 coordinates = tripData.road,
-                clientsCount = tripData.clients.count {
-                    it.status == "Active" || it.status == "Picked" || it.status == "Finished"
-                }
+                clientRouteDistances = activeClients.map { it.routeDistanceKm }
             )
         } ?: when (val currentState = state) {
-            is DriverScreenState.ConfirmedRoute -> TripSummary.fromRoute(
-                coordinates = currentState.road,
-                clientsCount = currentState.incomingClients.count {
+            is DriverScreenState.ConfirmedRoute -> {
+                val activeClients = currentState.incomingClients.filter {
                     it.status == "Active" || it.status == "Picked" || it.status == "Finished"
                 }
-            )
+                TripSummary.fromRoute(
+                    coordinates = currentState.road,
+                    clientRouteDistances = activeClients.map { it.routeDistanceKm }
+                )
+            }
             else -> TripSummary(
                 moneyEarned = "0.00 LEI",
                 totalTimeMinutes = 0,

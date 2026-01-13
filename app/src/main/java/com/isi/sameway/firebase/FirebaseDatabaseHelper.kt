@@ -64,7 +64,7 @@ object FirebaseDatabaseHelper {
         return usersRef.child(user.uid)
     }
 
-    fun requestAccessFromDriver(route: Route, start: LatLng, end: LatLng, requestedTime: Int, routeSegmentSize: Int) {
+    fun requestAccessFromDriver(route: Route, start: LatLng, end: LatLng, requestedTime: Int, routeDistanceKm: Double) {
         val databaseRouteForClients = usersRef.child(route.userId).child("route").child("clients")
         databaseRouteForClients.get().addOnSuccessListener {
             if (it.exists()) {
@@ -74,7 +74,7 @@ object FirebaseDatabaseHelper {
                     end = end,
                     status = "Waiting",
                     requestedTime = requestedTime,
-                    routeSegmentSize = routeSegmentSize
+                    routeDistanceKm = routeDistanceKm
                 ))
                 it.child(it.childrenCount.toString())
             } else {
@@ -84,7 +84,7 @@ object FirebaseDatabaseHelper {
                     end = end,
                     status = "Waiting",
                     requestedTime = requestedTime,
-                    routeSegmentSize = routeSegmentSize)))
+                    routeDistanceKm = routeDistanceKm)))
             }
 
         }
@@ -185,8 +185,9 @@ object FirebaseDatabaseHelper {
                     val start = clientSnapshot.child("start").getValue(Coordinate::class.java) ?: Coordinate()
                     val end = clientSnapshot.child("end").getValue(Coordinate::class.java) ?: Coordinate()
                     val requestedTime = clientSnapshot.child("requestedTime").getValue(Int::class.java) ?: 0
+                    val routeDistanceKm = clientSnapshot.child("routeDistanceKm").getValue(Double::class.java) ?: 0.0
 
-                    Client(user = userId, start = start.toLatLng(), end = end.toLatLng(), status = status, requestedTime = requestedTime)
+                    Client(user = userId, start = start.toLatLng(), end = end.toLatLng(), status = status, requestedTime = requestedTime, routeDistanceKm = routeDistanceKm)
                 }
                 callback(clients)
             }

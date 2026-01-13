@@ -8,6 +8,7 @@ import com.isi.sameway.firebase.FirebaseDatabaseHelper
 import com.isi.sameway.firebase.FirebaseDatabaseHelper.observeRoutes
 import com.isi.sameway.firebase.Route
 import com.isi.sameway.firebase.gaussianDistance
+import com.isi.sameway.utils.RouteCalculations
 import com.isi.sameway.utils.TimeUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -173,9 +174,9 @@ class ClientScreenViewModel : ViewModel() {
     private fun handleAnswerRoute(route: MatchedRoute, accept: Boolean) {
         if (accept) {
             val clientStartTime = _state.value.routeDetails?.startTime ?: 0
-            val routeSegmentSize = route.route.coordinates.size
+            val routeDistanceKm = RouteCalculations.calculateDistanceKm(route.route.coordinates)
             FirebaseDatabaseHelper.requestAccessFromDriver(
-                route.route, route.route.coordinates.first(), route.route.coordinates.last(), clientStartTime, routeSegmentSize
+                route.route, route.route.coordinates.first(), route.route.coordinates.last(), clientStartTime, routeDistanceKm
             )
             _state.update { it.copy(acceptedRoute = route) }
         } else {

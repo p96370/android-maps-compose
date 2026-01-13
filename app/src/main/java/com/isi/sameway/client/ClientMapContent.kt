@@ -10,6 +10,7 @@ import com.isi.sameway.firebase.Route
 import com.isi.sameway.utils.CarMarker
 import com.isi.sameway.utils.DrawPoliline
 import com.isi.sameway.utils.MapIconDescriptors
+import com.isi.sameway.utils.RouteCalculations
 import kotlin.math.max
 
 /**
@@ -21,10 +22,12 @@ fun ClientMapContent(
     carPosition: LatLng,
     icons: MapIconDescriptors
 ) {
-    // Draw user-selected start/end markers
+    // Draw user-selected start/end markers (hide after driver passes them when ride is active)
     UserSelectedMarkers(
         startPosition = state.start,
-        endPosition = state.end
+        endPosition = state.end,
+        fullDriverRoute = if (state.acceptedByDriver == true) state.fullDriverRoute else emptyList(),
+        driverCarPosition = state.driverCarPosition
     )
 
     // Draw available routes and their endpoints
@@ -85,26 +88,51 @@ fun ClientMapContent(
 
 /**
  * Renders the user-selected start and end location markers.
+ * When fullDriverRoute is provided, markers are hidden after the driver passes them.
  */
 @Composable
 private fun UserSelectedMarkers(
     startPosition: LatLng?,
-    endPosition: LatLng?
+    endPosition: LatLng?,
+    fullDriverRoute: List<LatLng> = emptyList(),
+    driverCarPosition: Int = 0
 ) {
     startPosition?.let { position ->
-        Marker(
-            state = MarkerState(position = position),
-            title = position.toString(),
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
-        )
+        // Hide start marker if driver has passed it
+        val hasPassedStart = if (fullDriverRoute.isNotEmpty()) {
+            RouteCalculations.hasCarPassedMarker(
+                route = fullDriverRoute,
+                carPositionIndex = driverCarPosition,
+                markerPosition = position
+            )
+        } else false
+
+        if (!hasPassedStart) {
+            Marker(
+                state = MarkerState(position = position),
+                title = position.toString(),
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
+            )
+        }
     }
 
     endPosition?.let { position ->
-        Marker(
-            state = MarkerState(position = position),
-            title = position.toString(),
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
-        )
+        // Hide end marker if driver has passed it
+        val hasPassedEnd = if (fullDriverRoute.isNotEmpty()) {
+            RouteCalculations.hasCarPassedMarker(
+                route = fullDriverRoute,
+                carPositionIndex = driverCarPosition,
+                markerPosition = position
+            )
+        } else false
+
+        if (!hasPassedEnd) {
+            Marker(
+                state = MarkerState(position = position),
+                title = position.toString(),
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
+            )
+        }
     }
 }
 

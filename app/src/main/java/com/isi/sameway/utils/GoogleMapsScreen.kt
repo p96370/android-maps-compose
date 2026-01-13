@@ -1,6 +1,5 @@
 package com.isi.sameway.utils
 
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -33,8 +32,8 @@ fun GoogleMapsScreen(
         },
         cameraPositionState = cameraPositionState,
         properties = MapProperties(mapType = MapType.NORMAL, isMyLocationEnabled = true),
-        onPOIClick = {
-            Log.d("car pooling", "POI clicked: ${it.name}")
+        onPOIClick = { poi ->
+            onMapClick(poi.latLng)
         },
         mapColorScheme = ComposeMapColorScheme.DARK,
         onMapClick = { latLng ->
